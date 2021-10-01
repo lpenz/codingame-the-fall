@@ -1,0 +1,21 @@
+#!/bin/bash
+
+function git-subtree {
+    PREFIX="$1"
+    REPO="$2"
+    BRANCH="$3"
+    if ! git remote show "$REPO" &> /dev/null; then
+        git remote add -f "$REPO" git@github.com:"$REPO".git
+    fi
+    git fetch "$REPO"
+    if ! [ -d "$PREFIX" ]; then
+        git subtree add --prefix "$PREFIX" "$REPO" "$BRANCH" --squash
+    else
+        git subtree pull --prefix "$PREFIX" "$REPO" "$BRANCH" --squash
+    fi
+}
+
+set -e -x -o pipefail
+
+git-subtree external/sqrid lpenz/sqrid bfs
+
