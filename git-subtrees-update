@@ -17,5 +17,5 @@ function git-subtree {
 
 set -e -x -o pipefail
 
-git-subtree external/sqrid lpenz/sqrid bfs
+git-subtree external/sqrid lpenz/sqrid devel
 
