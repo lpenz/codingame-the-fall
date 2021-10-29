@@ -53,8 +53,8 @@ pub fn input_first(
             gridline[x] = cellnum.parse()?;
         }
     }
-    let x = lineread(lineit)?;
-    params.exit = Qa::try_from((x.parse()?, params.height - 1))?;
+    let line = lineread(lineit)?;
+    params.exit = Qa::try_from((line.parse()?, params.height - 1))?;
     Ok(())
 }
 
