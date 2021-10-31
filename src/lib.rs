@@ -6,6 +6,6 @@ pub mod sqrid;
 pub use self::sqrid::*;
 
 pub mod core;
-pub mod entrypoint;
+pub mod entrypoint1;
 pub mod error;
 pub mod input;

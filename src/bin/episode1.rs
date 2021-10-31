@@ -5,9 +5,9 @@
 use std::error::Error;
 
 extern crate the_last_crusade;
-use the_last_crusade::entrypoint;
+use the_last_crusade::entrypoint1;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    entrypoint::main()?;
+    entrypoint1::main()?;
     Ok(())
 }

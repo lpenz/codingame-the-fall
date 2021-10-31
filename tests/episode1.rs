@@ -8,7 +8,7 @@ use std::iter;
 use anyhow::Result;
 
 use the_last_crusade::core::*;
-use the_last_crusade::entrypoint::*;
+use the_last_crusade::entrypoint1::*;
 use the_last_crusade::input::*;
 
 #[test]
