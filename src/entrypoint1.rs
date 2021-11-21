@@ -9,11 +9,11 @@ use std::io::BufRead;
 use crate::core::*;
 use crate::input::*;
 
-pub fn eval(params: &Params, node: &Node) -> Qa {
-    let dir = params.grid[node.indy]
-        .enter(node.dir)
+pub fn eval(_params: &Params, node: &Node) -> Qa {
+    let dir = node.grid[node.indy.qa]
+        .enter(&node.indy.qr)
         .expect("invalid indy direction");
-    (node.indy + dir).expect("invalid next indy direction")
+    (node.indy.qa + dir).expect("invalid next indy direction")
 }
 
 pub fn main() -> Result<(), Box<dyn Error>> {
@@ -27,7 +27,7 @@ pub fn main() -> Result<(), Box<dyn Error>> {
         params.width, params.height, params.exit
     );
     loop {
-        input(&mut stdin_lines, &params, &mut node)?;
+        input_ep1(&mut stdin_lines, &params, &mut node)?;
         let qa = eval(&params, &node);
         let t = qa.tuple();
         println!("{} {}", t.0, t.1);

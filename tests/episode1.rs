@@ -63,7 +63,7 @@ fn test_input() -> Result<()> {
         ("2 8 RIGHT", Qa::try_from((2, 9)).unwrap()),
     ];
     for i in &inputs {
-        input(&mut iter::once(Ok(i.0.to_string())), &mut params, &mut node)?;
+        input_ep1(&mut iter::once(Ok(i.0.to_string())), &mut params, &mut node)?;
         assert_eq!(eval(&params, &node), i.1);
     }
     Ok(())

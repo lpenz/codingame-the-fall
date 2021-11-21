@@ -2,11 +2,12 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE', which is part of this source code package.
 
-pub mod sqrid;
-pub use self::sqrid::*;
+use std::error::Error;
 
-pub mod core;
-pub mod entrypoint1;
-pub mod entrypoint2;
-pub mod error;
-pub mod input;
+extern crate the_last_crusade;
+use the_last_crusade::entrypoint2;
+
+fn main() -> Result<(), Box<dyn Error>> {
+    entrypoint2::main()?;
+    Ok(())
+}

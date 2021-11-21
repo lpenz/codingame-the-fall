@@ -9,7 +9,7 @@ use rustsourcebundler::Bundler;
 
 fn main() {
     let mut bundler: Bundler = Bundler::new(
-        Path::new("src/bin/episode1.rs"),
+        Path::new("src/bin/episode2.rs"),
         Path::new("src/bin/singlefile.rs"),
     );
     bundler.crate_name("the_last_crusade");
