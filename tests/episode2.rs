@@ -75,7 +75,7 @@ fn test_case4() -> Result<()> {
         )?;
         let actionopt = solve(&params, &node);
         assert!(actionopt.is_some());
-        node.apply_real(actionopt.unwrap());
+        node.apply(&actionopt.unwrap());
     }
     Ok(())
 }

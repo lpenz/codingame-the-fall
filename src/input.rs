@@ -104,10 +104,14 @@ pub fn input_ep2(
 ) -> Result<(), Error> {
     input_ep1(lineit, params, node)?;
     let line = lineread(lineit)?;
-    node.num_rocks = line.parse::<usize>()?;
-    for i in 0..node.num_rocks {
-        let rock_str = lineread(lineit)?;
-        node.rock[i] = Some(rock_str.parse()?);
+    let num_rocks = line.parse::<usize>()?;
+    for irock in IRock::iter() {
+        if usize::from(irock) < num_rocks {
+            let rock_str = lineread(lineit)?;
+            node.rock[irock] = Some(rock_str.parse()?);
+        } else {
+            node.rock[irock] = None;
+        }
     }
     Ok(())
 }

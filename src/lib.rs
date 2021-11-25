@@ -5,6 +5,9 @@
 pub mod sqrid;
 pub use self::sqrid::*;
 
+pub mod andex;
+pub use self::andex::*;
+
 pub mod core;
 pub mod entrypoint1;
 pub mod entrypoint2;

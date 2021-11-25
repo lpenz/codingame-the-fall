@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE', which is part of this source code package.
 
+use std::collections::VecDeque;
 use std::error::Error;
 use std::io;
 use std::io::BufRead;
@@ -9,40 +10,43 @@ use std::io::BufRead;
 use crate::core::*;
 use crate::input::*;
 
-pub fn solve_helper(params: &Params, node0: &Node, focus0: Entity) -> (bool, Action) {
-    if check_indy_path(params, node0) {
-        return (true, Action::Wait);
+pub fn solve_helper(
+    params: &Params,
+    node0: &Node,
+    focus0: Entity,
+    iturn: usize,
+    steps: &mut VecDeque<Action>,
+) -> bool {
+    if check_indy_path(params, node0, &focus0) {
+        eprintln!("SUCCESS");
+        steps.push_front(Action::Wait);
+        return true;
     }
-    let rotopts = rotations(params, node0, focus0);
-    for rotopt in rotopts {
+    for actions in Action::available(params, node0, &focus0) {
         let mut node = *node0;
-        let action = Action::new(focus0.qa, *rotopt);
-        node.indy = focus0;
-        node.apply(action);
-        if let Some(focus) = node.entity_step(&focus0) {
-            let (ok, subaction) = solve_helper(params, &node, focus);
-            if ok {
-                if rotopt.is_none() {
-                    return (true, subaction);
-                } else {
-                    return (true, action);
+        for a in &actions {
+            node.apply(a);
+        }
+        if let Some(focus) = focus0.step(&node) {
+            if solve_helper(params, &node, focus, iturn + 1, steps) {
+                for a in &actions {
+                    steps.push_front(*a);
                 }
+                return true;
             }
         }
     }
-    (false, Action::Wait)
+    false
 }
 
-pub fn solve(params: &Params, node0: &Node) -> Option<Action> {
-    let mut node = *node0;
-    // Step indy and use it as focus
-    assert!(node.eval_indy_step());
-    let solution = solve_helper(params, &node, node.indy);
-    if solution.0 {
-        Some(solution.1)
-    } else {
-        None
+pub fn solve(params: &Params, node: &Node) -> Option<Action> {
+    let mut stepsbase = VecDeque::new();
+    let focus = node.indy.step(node)?;
+    if !solve_helper(params, node, focus, 0, &mut stepsbase) {
+        return None;
     }
+    // Check rocks:
+    Some(stepsbase[0])
 }
 
 pub fn main() -> Result<(), Box<dyn Error>> {
@@ -59,7 +63,7 @@ pub fn main() -> Result<(), Box<dyn Error>> {
         input_ep2(&mut stdin_lines, &params, &mut node)?;
         if let Some(action) = solve(&params, &node) {
             println!("{}", action);
-            node.apply_real(action);
+            node.apply(&action);
         } else {
             eprintln!("could not find solution");
         }

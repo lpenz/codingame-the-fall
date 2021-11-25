@@ -4,6 +4,8 @@
 
 use std::fmt;
 
+use crate::andex::*;
+
 pub const MAX_WIDTH: u16 = 20;
 pub const MAX_HEIGHT: u16 = 20;
 
@@ -11,6 +13,8 @@ pub type Sqrid = crate::sqrid_create!(MAX_WIDTH, MAX_HEIGHT, false);
 pub type Qa = crate::qa_create!(Sqrid);
 pub type Qr = crate::Qr;
 pub type Gridbool = crate::gridbool_create!(Sqrid);
+
+/* Cell *************************************************************/
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Cell {
@@ -172,7 +176,6 @@ impl Cell {
         match rot {
             Rotation::Left => self.rot_cc(),
             Rotation::Right => self.rot_cw(),
-            Rotation::Flip => self.rot_cw().rot_cw(),
         }
     }
 
@@ -196,11 +199,12 @@ impl Cell {
     }
 }
 
+/* Rotation *********************************************************/
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Rotation {
     Left,
     Right,
-    Flip,
 }
 
 impl fmt::Display for Rotation {
@@ -208,15 +212,28 @@ impl fmt::Display for Rotation {
         match self {
             Rotation::Left => write!(f, "LEFT"),
             Rotation::Right => write!(f, "RIGHT"),
-            Rotation::Flip => write!(f, "RIGHT"),
         }
     }
 }
+
+/* Entity ***********************************************************/
 
 #[derive(Debug, Default, Clone, Copy)]
 pub struct Entity {
     pub qa: Qa,
     pub qr: Qr,
+}
+
+impl Entity {
+    pub fn step(&self, node: &Node) -> Option<Entity> {
+        let cell = node.grid[self.qa];
+        if let Some(qr) = cell.enter(&self.qr) {
+            if let Some(qa) = self.qa + qr {
+                return Some(Entity { qa, qr });
+            }
+        }
+        None
+    }
 }
 
 impl fmt::Display for Entity {
@@ -226,19 +243,48 @@ impl fmt::Display for Entity {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+impl AsRef<Qa> for Entity {
+    fn as_ref(&self) -> &Qa {
+        &self.qa
+    }
+}
+
+/* Action ***********************************************************/
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Action {
     Wait,
     Rotate { qa: Qa, rot: Rotation },
 }
 
 impl Action {
-    pub fn new(qa: Qa, rotopt: Option<Rotation>) -> Action {
-        if let Some(rot) = rotopt {
-            Action::Rotate { qa, rot }
-        } else {
-            Action::Wait
+    pub fn new(qa: Qa, rot: Rotation) -> Action {
+        Action::Rotate { qa, rot }
+    }
+
+    pub fn rotation(&self) -> Option<Rotation> {
+        match self {
+            Action::Rotate { qa: _, rot } => Some(*rot),
+            _ => None,
         }
+    }
+
+    pub fn available(params: &Params, node: &Node, focus: &Entity) -> Vec<Vec<Action>> {
+        let mut ret = vec![vec![]];
+        if !params.frozen[focus.qa] {
+            let num_rot = node.grid[focus.qa].num_rot();
+            if num_rot > 0 {
+                ret.push(vec![Action::new(focus.qa, Rotation::Left)]);
+            }
+            if num_rot > 1 {
+                ret.push(vec![Action::new(focus.qa, Rotation::Right)]);
+                ret.push(vec![
+                    Action::new(focus.qa, Rotation::Right),
+                    Action::new(focus.qa, Rotation::Right),
+                ]);
+            }
+        }
+        ret
     }
 }
 
@@ -254,6 +300,14 @@ impl fmt::Display for Action {
     }
 }
 
+/* Rocks: Andex *****************************************************/
+
+pub enum IRockMarker {}
+pub type IRock = Andex<IRockMarker, 10>;
+pub type Rocks = AndexableArray<IRock, Option<Entity>, { IRock::SIZE }>;
+
+/* Params, Node *****************************************************/
+
 #[derive(Debug, Default)]
 pub struct Params {
     pub width: u16,
@@ -267,79 +321,56 @@ pub struct Params {
 pub struct Node {
     pub grid: crate::grid_create!(Sqrid, Cell),
     pub indy: Entity,
-    pub num_rocks: usize,
-    pub rock: [Option<Entity>; 10],
+    pub rock: Rocks,
 }
 
 impl Node {
-    pub fn apply(&mut self, action: Action) {
+    pub fn apply(&mut self, action: &Action) {
         match action {
             Action::Wait => {}
             Action::Rotate { qa, rot } => {
-                self.grid[qa] = self.grid[qa].rotate(&rot);
+                self.grid[qa] = self.grid[qa].rotate(rot);
             }
         }
-    }
-    pub fn apply_real(&mut self, action: Action) {
-        match action {
-            Action::Wait => {}
-            Action::Rotate { qa, rot } => {
-                if rot == Rotation::Flip {
-                    self.grid[qa] = self.grid[qa].rotate(&Rotation::Right);
-                } else {
-                    self.grid[qa] = self.grid[qa].rotate(&rot);
-                }
-            }
-        }
-    }
-    pub fn entity_step(&self, entity: &Entity) -> Option<Entity> {
-        let cell = self.grid[entity.qa];
-        if let Some(qr) = cell.enter(&entity.qr) {
-            if let Some(qa) = entity.qa + qr {
-                return Some(Entity { qa, qr });
-            }
-        }
-        None
     }
     pub fn eval_indy_step(&mut self) -> bool {
-        if let Some(indy) = self.entity_step(&self.indy) {
+        if let Some(indy) = self.indy.step(self) {
             self.indy = indy;
             return true;
         }
         false
     }
-}
-
-pub const ROT0: [Option<Rotation>; 1] = [None];
-pub const ROT1: [Option<Rotation>; 2] = [None, Some(Rotation::Left)];
-pub const ROT3: [Option<Rotation>; 4] = [
-    None,
-    Some(Rotation::Left),
-    Some(Rotation::Right),
-    Some(Rotation::Flip),
-];
-
-pub fn rotations(params: &Params, node: &Node, focus: Entity) -> &'static [Option<Rotation>] {
-    if params.frozen[focus.qa] {
-        &ROT0
-    } else {
-        let num_actions = node.grid[focus.qa].num_rot();
-        if num_actions == 0 {
-            &ROT0
-        } else if num_actions == 1 {
-            &ROT1
-        } else {
-            &ROT3
+    pub fn eval_all_step(&mut self) -> bool {
+        if !self.eval_indy_step() {
+            return false;
         }
+        for irock in IRock::iter() {
+            if let Some(rock) = self.rock[irock] {
+                self.rock[irock] = rock.step(self);
+            }
+        }
+        true
+    }
+    pub fn has_rock_collision(&self) -> Option<IRock> {
+        for irock in IRock::iter() {
+            if let Some(rock) = self.rock[irock] {
+                if rock.qa == self.indy.qa {
+                    return Some(irock);
+                }
+            }
+        }
+        None
     }
 }
 
-pub fn check_indy_path(params: &Params, node0: &Node) -> bool {
-    let mut node = *node0;
-    while node.indy.qa != params.exit {
-        if !node.eval_indy_step() {
+pub fn check_indy_path(params: &Params, node: &Node, indy0: &Entity) -> bool {
+    let mut indy = *indy0;
+    while indy.qa != params.exit {
+        if let Some(indy_new) = indy.step(node) {
+            indy = indy_new;
+        } else {
             return false;
-        };
+        }
     }
     true
 }

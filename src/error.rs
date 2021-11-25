@@ -7,6 +7,7 @@ use std::fmt;
 use std::io;
 use std::num;
 
+use crate::andex;
 use crate::sqrid;
 
 #[derive(Debug)]
@@ -14,6 +15,7 @@ pub enum Error {
     Io(io::Error),
     ParseInt(num::ParseIntError),
     Sqrid(sqrid::Error),
+    Andex(andex::Error),
     CellParseError,
     LineIteratorEnded,
     InvalidInput,
@@ -37,5 +39,10 @@ impl From<num::ParseIntError> for Error {
 impl From<sqrid::Error> for Error {
     fn from(e: sqrid::Error) -> Error {
         Error::Sqrid(e)
+    }
+}
+impl From<andex::Error> for Error {
+    fn from(e: andex::Error) -> Error {
+        Error::Andex(e)
     }
 }
