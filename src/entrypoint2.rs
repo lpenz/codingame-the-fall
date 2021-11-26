@@ -39,14 +39,41 @@ pub fn solve_helper(
     false
 }
 
+pub fn rock_solve(
+    params: &Params,
+    node: &Node,
+    mut steps: VecDeque<Action>,
+    irock: IRock,
+    qa_collision: Qa,
+) -> Option<Action> {
+    for focus in node.rock[irock].unwrap().iter(node) {
+        if focus.qa == qa_collision {
+            return None;
+        }
+        if params.frozen[focus.qa] || node.grid[focus.qa].num_rot() == 0 {
+            continue;
+        }
+        let action = Action::new(focus.qa, Rotation::Left);
+        steps[0] = action;
+        if simulate(params, &node, steps.clone()).irock() != Some(irock) {
+            return Some(action);
+        }
+    }
+    None
+}
+
 pub fn solve(params: &Params, node: &Node) -> Option<Action> {
     let mut stepsbase = VecDeque::new();
     let focus = node.indy.step(node)?;
     if !solve_helper(params, node, focus, 0, &mut stepsbase) {
         return None;
     }
-    // Check rocks:
-    Some(stepsbase[0])
+    stepsbase.push_front(Action::Wait);
+    match simulate(params, node, stepsbase.clone()) {
+        Destiny::Victory => Some(Action::Wait),
+        Destiny::Rock(irock, qa) => rock_solve(params, node, stepsbase, irock, qa),
+        _ => Some(stepsbase[1]),
+    }
 }
 
 pub fn main() -> Result<(), Box<dyn Error>> {

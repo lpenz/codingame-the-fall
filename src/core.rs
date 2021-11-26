@@ -2,6 +2,7 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE', which is part of this source code package.
 
+use std::collections::VecDeque;
 use std::fmt;
 
 use crate::andex::*;
@@ -234,6 +235,12 @@ impl Entity {
         }
         None
     }
+    pub fn iter<'a>(&self, node: &'a Node) -> EntityPathIter<'a> {
+        EntityPathIter {
+            entity: Some(*self),
+            node: node,
+        }
+    }
 }
 
 impl fmt::Display for Entity {
@@ -249,6 +256,21 @@ impl AsRef<Qa> for Entity {
     }
 }
 
+pub struct EntityPathIter<'a> {
+    pub entity: Option<Entity>,
+    pub node: &'a Node,
+}
+
+impl<'a> Iterator for EntityPathIter<'a> {
+    type Item = Entity;
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some(ent0) = self.entity {
+            self.entity = ent0.step(self.node);
+        }
+        self.entity
+    }
+}
+
 /* Action ***********************************************************/
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -260,6 +282,13 @@ pub enum Action {
 impl Action {
     pub fn new(qa: Qa, rot: Rotation) -> Action {
         Action::Rotate { qa, rot }
+    }
+
+    pub fn qa(&self) -> Option<Qa> {
+        match self {
+            Action::Rotate { qa, rot: _ } => Some(*qa),
+            _ => None,
+        }
     }
 
     pub fn rotation(&self) -> Option<Rotation> {
@@ -363,14 +392,52 @@ impl Node {
     }
 }
 
-pub fn check_indy_path(params: &Params, node: &Node, indy0: &Entity) -> bool {
-    let mut indy = *indy0;
-    while indy.qa != params.exit {
-        if let Some(indy_new) = indy.step(node) {
-            indy = indy_new;
-        } else {
-            return false;
+pub fn check_indy_path(params: &Params, node: &Node, indy: &Entity) -> bool {
+    if indy.qa == params.exit {
+        return true;
+    }
+    for indy in indy.iter(node) {
+        if indy.qa == params.exit {
+            return true;
         }
     }
-    true
+    false
+}
+
+// Complete simulation
+
+#[derive(PartialEq, Eq, Copy, Clone, Debug)]
+pub enum Destiny {
+    InvalidAction,
+    Wall(Qa),
+    Rock(IRock, Qa),
+    Victory,
+}
+
+impl Destiny {
+    pub fn irock(&self) -> Option<IRock> {
+        match self {
+            Destiny::Rock(irock, _) => Some(*irock),
+            _ => None,
+        }
+    }
+}
+
+pub fn simulate(params: &Params, node0: &Node, mut steps: VecDeque<Action>) -> Destiny {
+    let mut node = *node0;
+    while node.indy.qa != params.exit {
+        if let Some(action) = steps.pop_front() {
+            if action.qa() == Some(node.indy.qa) {
+                return Destiny::InvalidAction;
+            }
+            node.apply(&action);
+        }
+        if !node.eval_all_step() {
+            return Destiny::Wall(node.indy.qa);
+        }
+        if let Some(irock) = node.has_rock_collision() {
+            return Destiny::Rock(irock, node.indy.qa);
+        }
+    }
+    Destiny::Victory
 }
