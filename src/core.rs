@@ -64,7 +64,26 @@ impl From<Cell> for char {
 
 impl fmt::Display for Cell {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", char::from(*self))
+        write!(
+            f,
+            "{}",
+            match self {
+                Cell::Type0 => "  ",
+                Cell::Type1 => "\u{254b}\u{2501}",
+                Cell::Type2 => "\u{2501}\u{2501}",
+                Cell::Type3 => "\u{2503} ",
+                Cell::Type4 => "\u{251b}\u{250f}",
+                Cell::Type5 => "\u{2513}\u{2517}",
+                Cell::Type6 => "\u{253b}\u{2501}",
+                Cell::Type7 => "\u{2523}\u{2501}",
+                Cell::Type8 => "\u{2533}\u{2501}",
+                Cell::Type9 => "\u{252b}\u{2501}",
+                Cell::Type10 => "\u{251b}\u{2501}",
+                Cell::Type11 => "\u{2517}\u{2501}",
+                Cell::Type12 => "\u{250f}\u{2501}",
+                Cell::Type13 => "\u{2513}\u{2501}",
+            }
+        )
     }
 }
 
