@@ -10,6 +10,8 @@ use std::str::FromStr;
 use crate::core::*;
 use crate::error::*;
 
+const DEBUG: bool = false;
+
 impl FromStr for Cell {
     type Err = Error;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -55,7 +57,9 @@ impl FromStr for Entity {
 
 fn lineread(lineit: &mut impl Iterator<Item = io::Result<String>>) -> Result<String, Error> {
     let line = lineit.next().ok_or(Error::LineIteratorEnded)??;
-    // eprintln!("# {}", line);
+    if DEBUG {
+        eprintln!("# {}", line);
+    }
     Ok(line)
 }
 
@@ -70,7 +74,9 @@ pub fn input_first(
     params.height = wh[1].parse()?;
     for (y, lineres) in (0..params.height).zip(lineit.take(params.height as usize)) {
         let line = lineres?;
-        // eprintln!("# {}", line);
+        if DEBUG {
+            eprintln!("# {}", line);
+        }
         let gridline = params.grid0.line_mut(y);
         for (x, cellnum) in line.split(' ').enumerate() {
             let firstchar = cellnum.chars().next().unwrap();
