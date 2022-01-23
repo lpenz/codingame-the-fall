@@ -257,7 +257,7 @@ impl Entity {
     pub fn iter<'a>(&self, node: &'a Node) -> EntityPathIter<'a> {
         EntityPathIter {
             entity: Some(*self),
-            node: node,
+            node,
         }
     }
 }

@@ -55,7 +55,7 @@ pub fn rock_solve(
         }
         let action = Action::new(focus.qa, Rotation::Left);
         steps[0] = action;
-        if simulate(params, &node, steps.clone()).irock() != Some(irock) {
+        if simulate(params, node, steps.clone()).irock() != Some(irock) {
             return Some(action);
         }
     }
