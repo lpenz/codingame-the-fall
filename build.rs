@@ -12,6 +12,6 @@ fn main() {
         Path::new("src/bin/episode2.rs"),
         Path::new("src/bin/singlefile.rs"),
     );
-    bundler.crate_name("the_last_crusade");
+    bundler.crate_name("the_fall");
     bundler.run();
 }

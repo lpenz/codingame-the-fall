@@ -7,9 +7,9 @@ use std::iter;
 
 use anyhow::Result;
 
-use the_last_crusade::core::*;
-use the_last_crusade::entrypoint1::*;
-use the_last_crusade::input::*;
+use the_fall::core::*;
+use the_fall::entrypoint1::*;
+use the_fall::input::*;
 
 #[test]
 fn test_input() -> Result<()> {

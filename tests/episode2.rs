@@ -4,9 +4,9 @@
 
 use anyhow::Result;
 
-use the_last_crusade::core::*;
-use the_last_crusade::entrypoint2::*;
-use the_last_crusade::input::*;
+use the_fall::core::*;
+use the_fall::entrypoint2::*;
+use the_fall::input::*;
 
 #[test]
 fn test_case4() -> Result<()> {

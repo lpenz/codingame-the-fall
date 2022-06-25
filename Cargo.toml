@@ -1,5 +1,5 @@
 [package]
-name = "the-last-crusade"
+name = "the-fall"
 version = "0.0.1"
 authors = ["Leandro Lisboa Penz <lpenz@lpenz.org>"]
 build = "build.rs"

@@ -4,8 +4,8 @@
 
 use std::error::Error;
 
-extern crate the_last_crusade;
-use the_last_crusade::entrypoint1;
+extern crate the_fall;
+use the_fall::entrypoint1;
 
 fn main() -> Result<(), Box<dyn Error>> {
     entrypoint1::main()?;
