@@ -1,0 +1,23 @@
+[package]
+name = "sqrid"
+description = "Square coordinates and grid-like arrays, with zero dependencies, in a single file"
+version = "0.0.13"
+authors = ["Leandro Lisboa Penz <lpenz@lpenz.org>"]
+edition = "2018"
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/lpenz/sqrid"
+repository = "https://github.com/lpenz/sqrid"
+categories = ["data-structures"]
+keywords = ["grid", "square", "arrays"]
+
+[lib]
+bench = false
+
+[dev-dependencies]
+anyhow = "1.0.57"
+criterion = { version = "0.3.5", features = ["html_reports"] }
+
+[[bench]]
+name = "benchmark"
+harness = false
