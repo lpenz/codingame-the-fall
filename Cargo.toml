@@ -1,0 +1,15 @@
+[package]
+name = "andex"
+description = "Safe, strongly typed array indexes and wrappers for rust with zero dependencies"
+version = "0.0.14"
+authors = ["Leandro Lisboa Penz <lpenz@lpenz.org>"]
+edition = "2018"
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/lpenz/andex"
+repository = "https://github.com/lpenz/andex"
+categories = ["rust-patterns"]
+keywords = ["wrapper", "indexing", "arrays", "index", "indexed"]
+
+[dev-dependencies]
+anyhow = "1.0.57"
