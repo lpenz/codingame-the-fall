@@ -5,7 +5,7 @@
 use std::collections::VecDeque;
 use std::fmt;
 
-use crate::andex::*;
+use super::andex::*;
 
 pub const MAX_WIDTH: u16 = 20;
 pub const MAX_HEIGHT: u16 = 20;

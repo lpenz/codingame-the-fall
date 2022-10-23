@@ -9,8 +9,9 @@ edition = "2018"
 doctest = false
 
 [build-dependencies]
-rustsourcebundler = "0.10.0"
+rustsourcebundler = "0.11.0"
 # rustsourcebundler = { git = "https://github.com/lpenz/rust-sourcebundler", branch = "devel" }
+# rustsourcebundler = { path = "/home/lpenz/Sync/projs/github-1-wip/rust-sourcebundler" }
 
 [dependencies]
 itertools = "0.10.0"

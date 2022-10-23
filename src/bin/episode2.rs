@@ -5,7 +5,7 @@
 use std::error::Error;
 
 extern crate the_fall;
-use the_fall::entrypoint2;
+pub use self::the_fall::*;
 
 fn main() -> Result<(), Box<dyn Error>> {
     entrypoint2::main()?;

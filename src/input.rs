@@ -7,8 +7,8 @@ use std::convert::TryInto;
 use std::io;
 use std::str::FromStr;
 
-use crate::core::*;
-use crate::error::*;
+use super::core::*;
+use super::error::*;
 
 const DEBUG: bool = false;
 

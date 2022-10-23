@@ -6,8 +6,8 @@ use std::error::Error;
 use std::io;
 use std::io::BufRead;
 
-use crate::core::*;
-use crate::input::*;
+use super::core::*;
+use super::input::*;
 
 pub fn eval(_params: &Params, node: &Node) -> Qa {
     let dir = node.grid[node.indy.qa]

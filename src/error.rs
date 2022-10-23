@@ -7,8 +7,8 @@ use std::fmt;
 use std::io;
 use std::num;
 
-use crate::andex;
-use crate::sqrid;
+use super::andex;
+use super::sqrid;
 
 #[derive(Debug)]
 pub enum Error {

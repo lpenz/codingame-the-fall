@@ -7,8 +7,8 @@ use std::error::Error;
 use std::io;
 use std::io::BufRead;
 
-use crate::core::*;
-use crate::input::*;
+use super::core::*;
+use super::input::*;
 
 pub fn solve_helper(
     params: &Params,
