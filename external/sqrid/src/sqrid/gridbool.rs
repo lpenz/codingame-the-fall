@@ -40,7 +40,7 @@ macro_rules! impl_assert {
 macro_rules! gridbool_create {
     ($sqrid: ty) => {
         $crate::Gridbool<{ <$sqrid>::WIDTH }, { <$sqrid>::HEIGHT },
-        { (((<$sqrid>::WIDTH as usize) * (<$sqrid>::HEIGHT as usize) + 31) / 32) }>
+        { ((<$sqrid>::WIDTH as usize) * (<$sqrid>::HEIGHT as usize)).div_ceil(32) }>
     };
 }
 

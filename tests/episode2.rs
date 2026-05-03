@@ -69,8 +69,8 @@ fn test_case4() -> Result<()> {
     ];
     for i in &inputs {
         input_ep2(
-            &mut i.into_iter().map(|s| Ok(s.to_string())),
-            &mut params,
+            &mut i.iter().map(|s| Ok(s.to_string())),
+            &params,
             &mut node,
         )?;
         let actionopt = solve(&params, &node);
