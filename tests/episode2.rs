@@ -68,11 +68,7 @@ fn test_case4() -> Result<()> {
         vec!["2 8 LEFT", "0"],
     ];
     for i in &inputs {
-        input_ep2(
-            &mut i.iter().map(|s| Ok(s.to_string())),
-            &params,
-            &mut node,
-        )?;
+        input_ep2(&mut i.iter().map(|s| Ok(s.to_string())), &params, &mut node)?;
         let actionopt = solve(&params, &node);
         assert!(actionopt.is_some());
         node.apply(&actionopt.unwrap());
